@@ -25,8 +25,8 @@ def buscar_resposta(categoria, subcategoria, motivo):
 
 # Função para enviar e-mail
 def enviar_email(destinatario, assunto, mensagem):
-    remetente = os.getenv("peehhenriquee18@gmail.com")
-    senha = os.getenv("fbsl xagv zklg wmrs")
+    remetente = os.getenv("EMAIL_REMETENTE")
+    senha = os.getenv("EMAIL_SENHA")
 
     msg = MIMEText(mensagem)
     msg["Subject"] = assunto
@@ -57,4 +57,6 @@ def index():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(debug=True, host="0.0.0.0", port=port)
+
