@@ -72,7 +72,7 @@ def index():
             mensagem = f"Sua pergunta foi enviada para {email}."
         except Exception as e:
             mensagem = f"Erro ao enviar e-mail: {e}"
-    return render_template("index.html", mensagem=mensagem, resposta=resposta, email=email, estrutura=estrutura)
+    return render_template("index.html", mensagem=mensagem, email=email, estrutura=estrutura)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
