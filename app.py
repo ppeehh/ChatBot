@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import csv
 import smtplib
 from email.mime.text import MIMEText
+import os
 
 app = Flask(__name__)
 
@@ -24,8 +25,8 @@ def buscar_resposta(categoria, subcategoria, motivo):
 
 # Função para enviar e-mail
 def enviar_email(destinatario, assunto, mensagem):
-    remetente = "peehhenriquee18@gmail.com"
-    senha = "fbsl xagv zklg wmrs"
+    remetente = os.getenv("peehhenriquee18@gmail.com")
+    senha = os.getenv("fbsl xagv zklg wmrs")
 
     msg = MIMEText(mensagem)
     msg["Subject"] = assunto
