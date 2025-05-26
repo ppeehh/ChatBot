@@ -3,31 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <title>Chatbot RH</title>
+    <script type="text/javascript">
+     const estrutura = {{ estrutura | tojson | safe }};
+        function atualizarSubcategorias() {
+            const categoria = document.getElementById("categoria").value;
+            const subSelect = document.getElementById("subcategoria");
+            const motSelect = document.getElementById("motivo");
+
+            subSelect.innerHTML = "<option value=''>-- Selecione --</option>";
+            motSelect.innerHTML = "<option value=''>-- Selecione --</option>";
+
+            if (estrutura[categoria]) {
+                for (const sub of Object.keys(estrutura[categoria])) {
+                    const option = document.createElement("option");
+                    option.value = sub;
+                    option.text = sub;
+                    subSelect.appendChild(option);
+                }
+            }
+        }
+
+        function atualizarMotivos() {
+            const categoria = document.getElementById("categoria").value;
+            const subcategoria = document.getElementById("subcategoria").value;
+            const motSelect = document.getElementById("motivo");
+
+            motSelect.innerHTML = "<option value=''>-- Selecione --</option>";
+
+            if (estrutura[categoria] && estrutura[categoria][subcategoria]) {
+                for (const motivo of estrutura[categoria][subcategoria]) {
+                    const option = document.createElement("option");
+                    option.value = motivo;
+                    option.text = motivo;
+                    motSelect.appendChild(option);
+                }
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Chatbot RH - Busca Manual</h1>
     <form method="POST" autocomplete="off">
-    <label>Email do colaborador:</label><br>
-    <input type="email" name="email" autocomplete="off" required><br><br>
+        <label>Email do colaborador:</label><br>
+        <input type="email" name="email" value="{{ email }}" required><br><br>
 
-    <label>Categoria:</label><br>
-    <input type="text" name="categoria" autocomplete="off" required><br><br>
+        <label>Categoria:</label><br>
+        <select name="categoria" id="categoria" onchange="atualizarSubcategorias()" required>
+            <option value="">-- Selecione --</option>
+            {% for cat in estrutura.keys() %}
+                <option value="{{ cat }}">{{ cat }}</option>
+            {% endfor %}
+        </select><br><br>
 
-    <label>Subcategoria:</label><br>
-    <input type="text" name="subcategoria" autocomplete="off"><br><br>
+        <label>Subcategoria:</label><br>
+        <select name="subcategoria" id="subcategoria" onchange="atualizarMotivos()">
+            <option value="">-- Selecione --</option>
+        </select><br><br>
 
-    <label>Motivo:</label><br>
-    <input type="text" name="motivo" autocomplete="off"><br><br>
+        <label>Motivo:</label><br>
+        <select name="motivo" id="motivo">
+            <option value="">-- Selecione --</option>
+        </select><br><br>
 
-    <button type="submit">Buscar Resposta</button>
-</form>
-
+        <button type="submit">Buscar Resposta</button>
+    </form>
 
     {% if mensagem %}
-    <div style="margin-top:20px; padding:10px; background:#d0ffd0; border:1px solid #0a0;">
-        <strong>{{ mensagem }}</strong>
-    </div>
+        <div style="margin-top:20px; padding:10px; background:#d0ffd0; border:1px solid #0a0;">
+            <strong>{{ mensagem }}</strong>
+        </div>
     {% endif %}
 
+    {% if resposta %}
+        <div style="margin-top:20px; padding:10px; background:#f0f0f0; border:1px solid #333;">
+            <strong>Resposta:</strong> {{ resposta }}
+        </div>
+    {% endif %}
 </body>
 </html>

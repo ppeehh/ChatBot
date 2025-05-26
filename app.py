@@ -1,10 +1,28 @@
 from flask import Flask, render_template, request
 import csv
+import pandas as pd
 import smtplib
 from email.mime.text import MIMEText
 import os
 
 app = Flask(__name__)
+
+# Função para carregar estrutura de categorias, subcategorias e motivos
+def carregar_estrutura():
+    df = pd.read_csv("respostas.csv", sep=";")
+    estrutura = {}
+    for _, row in df.iterrows():
+        cat = row["Categoria"].strip()
+        sub = row["Subcategoria"].strip() if pd.notna(row["Subcategoria"]) else ""
+        mot = row["Motivo"].strip() if pd.notna(row["Motivo"]) else ""
+
+        if cat not in estrutura:
+            estrutura[cat] = {}
+        if sub not in estrutura[cat]:
+            estrutura[cat][sub] = []
+        if mot and mot not in estrutura[cat][sub]:
+            estrutura[cat][sub].append(mot)
+    return estrutura
 
 # Função para buscar resposta no CSV
 def buscar_resposta(categoria, subcategoria, motivo):
@@ -39,6 +57,7 @@ def enviar_email(destinatario, assunto, mensagem):
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    estrutura = carregar_estrutura()
     mensagem = ""
     resposta = ""
     email = ""
@@ -53,10 +72,8 @@ def index():
             mensagem = f"Sua pergunta foi enviada para {email}."
         except Exception as e:
             mensagem = f"Erro ao enviar e-mail: {e}"
-    return render_template("index.html", mensagem=mensagem, resposta=resposta, email=email)
-
+    return render_template("index.html", mensagem=mensagem, resposta=resposta, email=email, estrutura=estrutura)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5001))
     app.run(debug=True, host="0.0.0.0", port=port)
-
